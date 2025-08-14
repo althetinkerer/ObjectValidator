@@ -513,27 +513,21 @@ def setup_logger(log_file, log_level):
     logger = logging.getLogger('my_logger')
     logger.setLevel(intLogLevel)
 
-    # Create file handler
-    if log_file != '':
-        file_handler = logging.FileHandler(log_file)
-    file_handler.setLevel(intLogLevel)
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s', '%Y%m%d - %H:%M:%S')
 
     # Create console handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(intLogLevel)
-
-    # Create formatter
-    formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(levelname)s - %(message)s', '%Y%m%d - %H:%M:%S')
-
-    # Add formatter to handlers
-    if log_file != '':
-        file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
-
-    # Add handlers to the logger
-    if log_file != '':
-        logger.addHandler(file_handler)
     logger.addHandler(console_handler)
+
+    # Create file handler
+    if log_file and log_file != '':
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(intLogLevel)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
     return logger
 
@@ -552,22 +546,62 @@ walacor_Bearer_Expiration = 0.0
 
 if __name__ == "__main__":
     
-    prog_mode = int(get_parameter(1))
-    source_type = int(get_parameter(2))
-    walacor_endpoint = get_parameter(3)
-    walacor_user = get_parameter(4)
-    walacor_password = get_parameter(5)
-    log_filename = get_parameter(6)
-    log_level = int(get_parameter(7))
-    source_root = get_parameter(8)
-    focus_model = get_parameter(9)
-    s3_endpoint = get_parameter(10)
-    s3_access = get_parameter(11)
-    s3_secret = get_parameter(12)
-    s3_region= get_parameter(13)
-    s3_bucket = get_parameter(14)
+    # Load configuration from config.json if it exists
+    config = {}
+    try:
+        with open('config.json', 'r') as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        pass  # It's okay if the config file doesn't exist
 
-    logger = setup_logger(log_filename,log_level)
+    # Helper to get parameter, prioritizing command-line args over config file
+    def get_param(position, config_key):
+        val = get_parameter(position)
+        if val is not None:
+            return val
+        return config.get(config_key)
+
+    # Get all parameters
+    prog_mode_str = get_param(1, "mode")
+    source_type_str = get_param(2, "source")
+    walacor_endpoint = get_param(3, "walacor_api_endpoint")
+    walacor_user = get_param(4, "walacor_api_user")
+    walacor_password = get_param(5, "walacor_api_password")
+    log_filename = get_param(6, "log_file_name")
+    log_level_str = get_param(7, "log_level")
+    source_root = get_param(8, "root")
+    focus_model = get_param(9, "specific_dir")
+    s3_endpoint = get_param(10, "s3_endpoint")
+    s3_access = get_param(11, "s3_access_key")
+    s3_secret = get_param(12, "s3_secret_key")
+    s3_region = get_param(13, "s3_region")
+    s3_bucket = get_param(14, "s3_bucket_name")
+
+    # Type conversion and validation for required parameters
+    # Note: logger is not set up yet, so using print for errors.
+    if prog_mode_str is None:
+        print("Error: 'mode' is a required parameter.", file=sys.stderr)
+        sys.exit(1)
+    prog_mode = int(prog_mode_str)
+
+    if source_type_str is None:
+        print("Error: 'source' is a required parameter.", file=sys.stderr)
+        sys.exit(1)
+    source_type = int(source_type_str)
+
+    if walacor_endpoint is None or walacor_user is None or walacor_password is None:
+        print("Error: Walacor connection details (endpoint, user, password) are required.", file=sys.stderr)
+        sys.exit(1)
+
+    if log_level_str is None:
+        log_level = 20 # default
+    else:
+        log_level = int(log_level_str)
+
+    if log_filename is None:
+        log_filename = "" # default to console only
+
+    logger = setup_logger(log_filename, log_level)
 
     W_EnsureSchema()
 

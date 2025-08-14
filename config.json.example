@@ -1,0 +1,16 @@
+{
+    "mode": 1,
+    "source": 1,
+    "walacor_api_endpoint": "https://mywalacor.myplace.com/api",
+    "walacor_api_user": "WalacorUser",
+    "walacor_api_password": "WalacorPassword",
+    "log_file_name": "LogFile.txt",
+    "log_level": 20,
+    "root": "RootDir",
+    "specific_dir": "",
+    "s3_endpoint": "",
+    "s3_access_key": "",
+    "s3_secret_key": "",
+    "s3_region": "",
+    "s3_bucket_name": ""
+}
