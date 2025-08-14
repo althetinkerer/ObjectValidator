@@ -71,9 +71,32 @@ You need access to a running Walacor instance with Admin user credentials. I you
 [[Azure Marketplace]](https://azuremarketplace.microsoft.com/en-us/marketplace/apps?search=walacor)
 [[Azure install Doc]](https://admindoc.walacor.com/admin-documentation/latest/azure-server-instance-installation)
 
+# Configuration
+
+The script can be configured using a `config.json` file in the root of the project. A `config.json.example` file is provided to show the structure of the configuration file. You can copy this file to `config.json` and edit it with your configuration.
+
+The script prioritizes command-line arguments over the `config.json` file. If a parameter is provided both as a command-line argument and in the `config.json` file, the command-line argument will be used.
+
+Here are the available configuration options in `config.json`:
+
+*   `"mode"`: `1` for making signatures, `2` for validating them.
+*   `"source"`: `1` for local filesystem, `2` for S3.
+*   `"walacor_api_endpoint"`: The root URL of your Walacor API instance (e.g., "https://mywalacor.myplace.com/api").
+*   `"walacor_api_user"`: Your Walacor API username.
+*   `"walacor_api_password"`: Your Walacor API password.
+*   `"log_file_name"`: The name of the log file.
+*   `"log_level"`: The log level (10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL). `20` is recommended.
+*   `"root"`: The root directory to work from.
+*   `"specific_dir"`: A specific directory inside of the root.
+*   `"s3_endpoint"`: The S3 endpoint, if not using the standard AWS S3 endpoint.
+*   `"s3_access_key"`: Your S3 access key.
+*   `"s3_secret_key"`: Your S3 secret key.
+*   `"s3_region"`: The S3 region (e.g., "us-west-1").
+*   `"s3_bucket_name"`: The name of your S3 bucket.
+
 ## Getting Started
 
-The program takes positional parameters:
+The program can also take positional parameters:
 
 * 1 - Mode (1=make sig, 2=validate sig) I.E. 1
 * 2 - Source (1=Local File, 2=S3) I.E. 1
